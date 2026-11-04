@@ -1,9 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
- dev
-import { EMPTY, Observable, expand, map, reduce } from 'rxjs';
+import { HttpClient, HttpEvent, HttpParams } from '@angular/common/http';
 import { EMPTY, expand, map, Observable, reduce } from 'rxjs';
- dev
 import { Asset, AssetCategory, AssetRequest, AuditLog, RequestStatus, TeamMember, User } from './models';
 
 const API_URL = '/api';
@@ -45,7 +42,7 @@ export interface AssetImportResult {
 }
 export interface AuthCredentials { email: string; password: string; }
 export interface RegistrationData extends AuthCredentials { fullName: string; phoneNumber: string; identificationId: string; department?: string; }
-export interface AuthResponse { user: User; token: string; }
+export interface AuthResponse { user: User; }
 export interface HealthStatus { status: 'ok'; service: string; }
 export interface AdminRequestCounts extends Record<RequestStatus, number> { total: number; }
 export interface AdminRequestPage { items: AssetRequest[]; page: number; limit: number; total: number; totalPages: number; statusCounts?: AdminRequestCounts; }
@@ -55,6 +52,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   login(credentials: AuthCredentials): Observable<AuthResponse> { return this.http.post<ApiResponse<AuthResponse>>(`${API_URL}/auth/login`, credentials).pipe(map(response => response.data)); }
   register(data: RegistrationData): Observable<AuthResponse> { return this.http.post<ApiResponse<AuthResponse>>(`${API_URL}/auth/register`, data).pipe(map(response => response.data)); }
+  logout(): Observable<void> { return this.http.post<void>(`${API_URL}/auth/logout`, {}); }
   me(): Observable<User> { return this.http.get<ApiResponse<User>>(`${API_URL}/auth/me`).pipe(map(response => response.data)); }
 }
 

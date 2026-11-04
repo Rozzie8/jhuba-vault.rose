@@ -6,7 +6,8 @@ All responses use `{ success, data }` on success and `{ success: false, message,
 |---|---|---|---|
 | GET | `/health` | Public | API health |
 | POST | `/auth/register` | Public | Create innovator |
-| POST | `/auth/login` | Public | Issue JWT |
+| POST | `/auth/login` | Public | Validate credentials and issue the HTTP-only JWT cookie |
+| POST | `/auth/logout` | Public | Clear authentication cookies |
 | GET | `/auth/me` | Authenticated | Current user |
 | GET/PATCH | `/users/me` | Authenticated | Read/update own profile |
 | GET | `/assets`, `/assets/:id` | Public | Catalogue and detail |

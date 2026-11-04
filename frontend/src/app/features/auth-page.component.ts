@@ -32,7 +32,7 @@ import { BrandLogoComponent } from '../shared/brand-logo.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 
   template: `
-    <main class="auth-page" [class.login-only]="mode() !== 'register'">
+    <main class="auth-page" [class.login-only]="mode() !== 'register'" [class.register-only]="mode() === 'register'">
       <section class="intro-card" aria-label="About the JHUB Africa Vault">
         <div class="brand-row">
           <jhub-brand-logo logo="jhub" variant="auth" />
@@ -179,7 +179,19 @@ import { BrandLogoComponent } from '../shared/brand-logo.component';
       padding: 40px 0;
     }
 
+    .auth-page.register-only {
+      width: min(576px, calc(100% - 40px));
+      grid-template-columns: minmax(0, 1fr);
+      align-content: center;
+      justify-content: center;
+      padding: 40px 0;
+    }
+
     .login-only .intro-card {
+      display: none;
+    }
+
+    .register-only .intro-card {
       display: none;
     }
 
@@ -215,6 +227,14 @@ import { BrandLogoComponent } from '../shared/brand-logo.component';
 
     .login-only .brand-row jhub-brand-logo {
       width: 240px;
+      justify-content: center;
+    }
+
+    .register-only .brand-row {
+      justify-content: center;
+    }
+
+    .register-only .brand-row jhub-brand-logo {
       justify-content: center;
     }
 

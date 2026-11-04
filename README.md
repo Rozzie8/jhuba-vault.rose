@@ -43,6 +43,15 @@ cd "JHUB AFRICA VAULT"
 
 ## Frontend Setup
 
+From the repository root, the frontend can be started with:
+
+```bash
+npm install
+npm start
+```
+
+The equivalent commands from the frontend directory are:
+
 ```bash
 cd frontend
 npm install
@@ -82,6 +91,17 @@ Backend API runs on:
 ```text
 http://localhost:3000/api
 ```
+
+Authentication uses an HTTP-only `jhub_access_token` cookie containing a signed
+JWT. The browser sends it automatically with API requests; client code does
+not read or store the token. The cookie uses `SameSite=Lax` in development and
+is marked `Secure` in production. If the frontend and API are deployed on
+different sites, use HTTPS with `SameSite=None` and add CSRF protection for
+state-changing requests.
+
+Login and registration use the HTTP-only JWT cookie authentication described
+above. Start the frontend from the repository root with `npm start` and the
+API from `backend/` with `npm run dev`.
 
 ---
 

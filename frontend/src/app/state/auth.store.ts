@@ -16,15 +16,10 @@ export const AuthStore = signalStore(
     const hydrate = (): Observable<User | null> => {
       if (store.hydrated()) return of(store.user());
       if (hydration$) return hydration$;
-      const token = localStorage.getItem('jhub_access_token');
-      if (!token) {
-        patchState(store, { hydrated: true, hydrating: false, user: null });
-        return of(null);
-      }
       patchState(store, { hydrating: true, loading: true, error: null });
       hydration$ = authService.me().pipe(
         tap(user => patchState(store, { user })),
-        catchError(() => { localStorage.removeItem('jhub_access_token'); patchState(store, { user: null }); return of(null); }),
+        catchError(() => { patchState(store, { user: null }); return of(null); }),
         finalize(() => { patchState(store, { hydrated: true, hydrating: false, loading: false }); hydration$ = null; }),
         shareReplay({ bufferSize: 1, refCount: false })
       );
@@ -32,13 +27,17 @@ export const AuthStore = signalStore(
     };
     return {
       hydrate,
-      signIn(credentials: AuthCredentials | Role): void { if (typeof credentials === 'string') { patchState(store, { loading: false, error: 'Use the sign-in form to authenticate with your account.' }); return; } patchState(store, { loading: true, error: null }); authService.login(credentials).subscribe({ next: response => { localStorage.setItem('jhub_access_token', response.token); patchState(store, { user: response.user, hydrated: true, hydrating: false, loading: false, error: null }); void router.navigateByUrl(response.user.role === Role.ADMIN ? '/admin/dashboard' : '/app/dashboard'); }, error: error => patchState(store, { loading: false, error: this.errorMessage(error) }) }); },
-      register(data: RegistrationData): void { patchState(store, { loading: true, error: null }); authService.register(data).subscribe({ next: response => { localStorage.setItem('jhub_access_token', response.token); patchState(store, { user: response.user, hydrated: true, hydrating: false, loading: false, error: null }); void router.navigateByUrl('/app/profile'); }, error: error => patchState(store, { loading: false, error: this.errorMessage(error) }) }); },
-      signOut(): void { patchState(store, { user: null, hydrated: true, hydrating: false, loading: false, error: null }); localStorage.removeItem('jhub_access_token'); void router.navigateByUrl('/'); },
-      expireSession(): void { localStorage.removeItem('jhub_access_token'); patchState(store, { user: null, hydrated: true, hydrating: false, loading: false, error: 'Your session has expired. Sign in again to continue.' }); void router.navigateByUrl('/auth/login'); },
+      signIn(credentials: AuthCredentials | Role): void { if (typeof credentials === 'string') { patchState(store, { loading: false, error: 'Use the sign-in form to authenticate with your account.' }); return; } patchState(store, { loading: true, error: null }); authService.login(credentials).subscribe({ next: response => { patchState(store, { user: response.user, hydrated: true, hydrating: false, loading: false, error: null }); void router.navigateByUrl(response.user.role === Role.ADMIN ? '/admin/dashboard' : '/app/dashboard'); }, error: error => patchState(store, { loading: false, error: this.errorMessage(error) }) }); },
+      register(data: RegistrationData): void { patchState(store, { loading: true, error: null }); authService.register(data).subscribe({ next: response => { patchState(store, { user: response.user, hydrated: true, hydrating: false, loading: false, error: null }); void router.navigateByUrl('/app/profile'); }, error: error => patchState(store, { loading: false, error: this.errorMessage(error) }) }); },
+      signOut(): void { authService.logout().subscribe({ next: () => { patchState(store, { user: null, hydrated: true, hydrating: false, loading: false, error: null }); void router.navigateByUrl('/'); }, error: error => patchState(store, { error: this.errorMessage(error) }) }); },
+      expireSession(): void { patchState(store, { user: null, hydrated: true, hydrating: false, loading: false, error: 'Your session has expired. Sign in again to continue.' }); void router.navigateByUrl('/auth/login'); },
       clearError(): void { patchState(store, { error: null }); },
       updateUser(user: User): void { patchState(store, { user }); },
-      errorMessage(error: unknown): string { if (error instanceof HttpErrorResponse) return error.error?.message ?? 'Authentication request failed.'; return 'Authentication request failed.'; }
+      errorMessage(error: unknown): string {
+        if (!(error instanceof HttpErrorResponse)) return 'Authentication request failed.';
+        if (error.error?.error === 'VALIDATION_ERROR') return 'Enter a valid email address and password, then try again.';
+        return error.error?.message ?? 'Authentication request failed.';
+      }
     };
   })
 );

@@ -6,7 +6,7 @@ import { prisma } from '../config/prisma';
 import { HttpError } from '../middleware/errors';
 import { requireAuth, requireRole } from '../middleware/auth';
 import { adminRequestQuery, adminRequestSchema, adminSearchQuery, assetSchema, kenyanPhoneNumberSchema, loginSchema, registerSchema, rejectSchema, requestSchema, statusQuery } from '../validators/schemas';
-import { signToken } from '../utils/jwt';
+import { clearAuthCookie, setAuthCookie, signToken } from '../utils/jwt';
 import { audit } from '../services/audit.service';
 import { sendApprovalEmail } from '../services/mail.service';
 import { markOverdueRequests } from '../services/overdue.service';
@@ -55,8 +55,9 @@ async function createRequestForInnovator(input: ReturnType<typeof requestSchema.
 
 router.get('/health', async (_req, res) => { await prisma.$queryRaw`SELECT 1`; res.json({ success: true, data: { status: 'ok', service: 'jhub-africa-vault-api' } }); });
 
-router.post('/auth/register', async (req, res) => { const input = registerSchema.parse(req.body); const { password: _password, ...profile } = input; const passwordHash = await bcrypt.hash(input.password, 12); try { const user = await prisma.user.create({ data: { ...profile, passwordHash }, select: { id: true, fullName: true, email: true, phoneNumber: true, identificationId: true, department: true, bio: true, githubUrl: true, avatarUrl: true, role: true, createdAt: true, updatedAt: true } }); res.status(201).json({ success: true, data: { user, token: signToken(user.id, user.role) } }); } catch (error) { if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') throw new HttpError(409, 'DUPLICATE_USER', 'Email or identification number already exists'); throw error; } });
-router.post('/auth/login', async (req, res) => { const input = loginSchema.parse(req.body); const user = await prisma.user.findUnique({ where: { email: input.email } }); if (!user || !(await bcrypt.compare(input.password, user.passwordHash))) throw new HttpError(401, 'INVALID_CREDENTIALS', 'Email or password is incorrect'); res.json({ success: true, data: { user: publicUser(user), token: signToken(user.id, user.role) } }); });
+router.post('/auth/register', async (req, res) => { const input = registerSchema.parse(req.body); const { password: _password, ...profile } = input; const passwordHash = await bcrypt.hash(input.password, 12); try { const user = await prisma.user.create({ data: { ...profile, passwordHash }, select: { id: true, fullName: true, email: true, phoneNumber: true, identificationId: true, department: true, bio: true, githubUrl: true, avatarUrl: true, role: true, createdAt: true, updatedAt: true } }); setAuthCookie(res, signToken(user.id, user.role)); res.status(201).json({ success: true, data: { user } }); } catch (error) { if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') throw new HttpError(409, 'DUPLICATE_USER', 'Email or identification number already exists'); throw error; } });
+router.post('/auth/login', async (req, res) => { const input = loginSchema.parse(req.body); const user = await prisma.user.findUnique({ where: { email: input.email } }); if (!user || !(await bcrypt.compare(input.password, user.passwordHash))) throw new HttpError(401, 'INVALID_CREDENTIALS', 'Email or password is incorrect'); setAuthCookie(res, signToken(user.id, user.role)); res.json({ success: true, data: { user: publicUser(user) } }); });
+router.post('/auth/logout', (_req, res) => { clearAuthCookie(res); res.status(204).send(); });
 router.get('/auth/me', requireAuth, async (req, res) => { const user = await prisma.user.findUnique({ where: { id: req.auth!.userId } }); if (!user) throw new HttpError(404, 'USER_NOT_FOUND', 'User not found'); res.json({ success: true, data: publicUser(user) }); });
 
 router.get('/users/me', requireAuth, async (req, res) => { const user = await prisma.user.findUnique({ where: { id: req.auth!.userId } }); if (!user) throw new HttpError(404, 'USER_NOT_FOUND', 'User not found'); res.json({ success: true, data: publicUser(user) }); });
