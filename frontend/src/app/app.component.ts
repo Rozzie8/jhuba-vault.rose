@@ -10,11 +10,12 @@ import { AdminDashboard } from './core/api.service';
 import { AuthStore } from './state/auth.store';
 import { AssetStore } from './state/asset.store';
 import { BrandLogoComponent } from './shared/brand-logo.component';
+import { OverlayHostComponent } from './shared/overlay-host.component';
 
 @Component({
   selector: 'jhub-root',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, BrandLogoComponent],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, BrandLogoComponent, OverlayHostComponent],
   host: { '[class.landing-route]': 'isHome()' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -42,6 +43,7 @@ import { BrandLogoComponent } from './shared/brand-logo.component';
     @else if (isDashboardShell()) { <main class="dashboard page-width"><div class="dashboard-head"><div><p class="eyebrow">INNOVATOR WORKSPACE</p><h1>Your ideas, <em>in motion.</em></h1><p>Welcome back. Here is the pulse of your JHUB activity.</p></div><a class="primary-button" routerLink="/catalogue">Find assets <span>→</span></a></div>@if (dashboardLoading()) { <div class="dashboard-state">Loading dashboard metrics…</div> } @else if (dashboardError()) { <div class="dashboard-state error" role="alert">{{ dashboardError() }}</div> } @else { <div class="metric-grid"><div class="metric-card accent-blue"><small>ACTIVE REQUESTS</small><strong>{{ activeRequestCount() }}</strong><span>Pending or approved</span></div><div class="metric-card accent-green"><small>ACTIVE LOANS</small><strong>{{ activeLoanCount() }}</strong><span>Checked out or overdue</span></div><div class="metric-card"><small>RETURNED ASSETS</small><strong>{{ returnedRequestCount() }}</strong><span>Returned requests</span></div></div><section class="welcome-panel"><div><p class="eyebrow">KEEP BUILDING</p><h2>Have a new project<br>in mind?</h2><p>Find the components your team needs and start a request in a few minutes.</p><a class="arrow-link" routerLink="/catalogue">Browse the Vault ↗</a></div><span class="welcome-symbol">+</span></section> }</main> }
     @else { <main class="routed-page"></main> }
     <router-outlet></router-outlet>
+    <jhub-overlay-host />
   `,
   styles: [`
     :host { display:block; }

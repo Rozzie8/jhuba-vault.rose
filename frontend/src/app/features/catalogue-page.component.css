@@ -7,7 +7,7 @@
 .result-count strong { color: var(--ink); }
 .result-count .link { margin-left: 8px; }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
 
 .asset {
   position: relative;
@@ -17,7 +17,7 @@
   transition: border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
 }
 
-.asset:hover { border-color: var(--line-strong); box-shadow: var(--shadow-md); }
+.asset:hover { border-color: var(--blue); box-shadow: var(--shadow-sm); }
 .media { position: relative; aspect-ratio: 4 / 3; background: var(--surface-2); border-bottom: 1px solid var(--line-soft); }
 .media jhub-asset-image { position: absolute; inset: 0; min-height: 0; }
 .media-skeleton { aspect-ratio: 4 / 3; border-radius: 0; }
@@ -45,7 +45,8 @@
   gap: 16px;
   width: min(560px, calc(100% - 32px));
   padding: 12px 12px 12px 16px;
-  border-radius: var(--r-xl);
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: var(--r-lg);
   background: var(--navy);
   color: #fff;
   box-shadow: var(--shadow-lg);

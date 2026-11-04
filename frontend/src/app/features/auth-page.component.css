@@ -43,13 +43,7 @@
 .auth-aside--login {
   isolation: isolate;
   padding: clamp(24px, 4vw, 56px);
-  background-color: #0b1536;
-  background-image:
-    radial-gradient(ellipse at 82% 16%, rgb(66 99 222 / 0.56), transparent 44%),
-    radial-gradient(ellipse at 16% 86%, rgb(123 65 196 / 0.34), transparent 48%),
-    linear-gradient(140deg, #0b1536 0%, #18245a 52%, #111d49 100%);
-  background-size: 140% 140%;
-  animation: login-gradient-drift 32s ease-in-out infinite alternate;
+  background: var(--navy-800);
 }
 
 .auth-aside--login::before {
@@ -73,10 +67,7 @@
 }
 
 .auth-aside--login .login-panel-visuals {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
+  display: none;
 }
 
 .auth-aside--login .login-panel-orb {

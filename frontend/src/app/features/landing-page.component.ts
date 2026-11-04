@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AssetCategory } from '../core/models';
 import { AuthStore } from '../state/auth.store';
@@ -46,12 +47,14 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   protected readonly categoryIcon = categoryIcon;
 
   private autoplayTimer?: ReturnType<typeof setInterval>;
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor() {
     this.store.load();
   }
 
   ngOnInit(): void {
+    if (!this.isBrowser) return;
     this.autoplayTimer = setInterval(() => {
       if (this.shouldPauseAutoplay() || this.featuredAssets().length < 2) return;
       this.goToSlide(this.activeIndex() + 1);

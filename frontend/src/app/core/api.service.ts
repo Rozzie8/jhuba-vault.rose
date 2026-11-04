@@ -3,7 +3,9 @@ import { HttpClient, HttpEvent, HttpParams } from '@angular/common/http';
 import { EMPTY, expand, map, Observable, reduce } from 'rxjs';
 import { Asset, AssetCategory, AssetRequest, AuditLog, RequestStatus, TeamMember, User } from './models';
 
-const API_URL = '/api';
+const API_URL = typeof window === 'undefined' || window.location.port === '4000'
+  ? 'http://localhost:3000/api'
+  : '/api';
 interface ApiResponse<T> { success: boolean; data: T; }
 export interface AssetImportRow {
   rowNumber: number;

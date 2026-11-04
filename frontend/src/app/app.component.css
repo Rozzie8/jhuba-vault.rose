@@ -115,7 +115,9 @@
   padding: 0 12px 8px;
   color: var(--text-3);
   font-size: var(--fs-xs);
-  font-weight: 600;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .nav-link {
@@ -178,7 +180,21 @@
   width: 100%;
   max-width: var(--content-w);
   margin-inline: auto;
-  padding: 28px var(--page-gutter) 64px;
+  padding: 32px var(--page-gutter) 72px;
+}
+
+.sidebar-brand {
+  background: var(--navy);
+  border-bottom-color: var(--navy);
+}
+
+.sidebar-brand img {
+  filter: brightness(0) invert(1);
+}
+
+.topbar {
+  background: var(--surface);
+  backdrop-filter: none;
 }
 
 .user-menu { position: relative; }
